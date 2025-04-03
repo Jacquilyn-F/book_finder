@@ -11,11 +11,29 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // END - add these lines to make __dirname work
 
+// Import Apollo Server and schema
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import typeDefs from './schemas/typeDefs.js';
+import resolvers from './schemas/resolvers.js';
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Initialize Apollo Server
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+
+// Start Apollo Server
+await server.start();
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Apply Apollo middleware
+app.use('/graphql', expressMiddleware(server));
 
 // if we're in production, serve client/build as static assets
 if (process.env.NODE_ENV === 'production') {

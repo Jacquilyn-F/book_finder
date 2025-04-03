@@ -25,11 +25,11 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+      return;
     }
 
     try {
@@ -37,18 +37,21 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
         variables: { ...userFormData },
       });
 
+      if (!data || !data.addUser) {
+        throw new Error('No data returned from the server!');
+      }
+
       Auth.login(data.addUser.token);
-    } catch (err) {
-      console.error(err);
+      setUserFormData({
+        username: '',
+        email: '',
+        password: '',
+        savedBooks: [],
+      });
+    } catch (err: any) {
+      console.error('Signup error:', err.message);
       setShowAlert(true);
     }
-
-    setUserFormData({
-      username: '',
-      email: '',
-      password: '',
-      savedBooks: [],
-    });
   };
 
   return (
@@ -57,7 +60,7 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
         {/* show alert if server response is bad */}
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
-          Something went wrong with your signup!
+          {showAlert && 'Signup error: Please check your input or try again later.'}
         </Alert>
 
         <Form.Group className='mb-3'>
