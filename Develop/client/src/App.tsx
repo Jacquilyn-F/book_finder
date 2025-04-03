@@ -5,7 +5,7 @@ import { setContext } from '@apollo/client/link/context';
 
 import Navbar from './components/Navbar';
 
-// Create an HTTP link to the GraphQL server
+// Set up the GraphQL endpoint
 const httpLink = createHttpLink({
   uri: '/graphql',
 });

@@ -4,7 +4,7 @@
   "description": "",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server/server.js",
+    "start": "node server/dist/server.js",
     "start:dev": "concurrently \"cd server && npm run watch\" \"wait-on tcp:3001 && cd client && npm run dev\"",
     "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm run dev\"",
     "install": "cd server && npm i && cd ../client && npm i",
@@ -15,11 +15,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^8.2.0",
     "wait-on": "^8.0.3"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",
-    "apollo-server-express": "^3.13.0"
+    "apollo-server-express": "^3.13.0",
+    "react-bootstrap": "^2.9.0"
   }
 }
