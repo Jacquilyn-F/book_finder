@@ -3,16 +3,17 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 
-import { LOGIN_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
-import type { User } from '../models/User';
+import { LOGIN_USER } from '../utils/mutations';
 
+// biome-ignore lint/correctness/noEmptyPattern: <explanation>
 const LoginForm = ({}: { handleModalClose: () => void }) => {
-  const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
+  const [userFormData, setUserFormData] = useState({ email: '', password: '' });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
-  const [login, { error }] = useMutation(LOGIN_USER);
+  // Apollo mutation hook
+  const [loginUser] = useMutation(LOGIN_USER);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -30,33 +31,32 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
     }
 
     try {
-      const { data } = await login({
-        variables: { email: userFormData.email, password: userFormData.password },
+      const { data } = await loginUser({
+        variables: {
+          email: userFormData.email,
+          password: userFormData.password,
+        },
       });
-
-      if (!data || !data.login) {
-        throw new Error('No data returned from the server!');
-      }
 
       Auth.login(data.login.token);
-      setUserFormData({
-        username: '',
-        email: '',
-        password: '',
-        savedBooks: [],
-      });
-    } catch (err: any) {
-      console.error('Login error:', err.message);
+    } catch (err) {
+      console.error(err);
       setShowAlert(true);
     }
+
+    setUserFormData({
+      email: '',
+      password: '',
+    });
   };
 
   return (
     <>
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
-        <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert || !!error} variant='danger'>
+        <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your login credentials!
         </Alert>
+
         <Form.Group className='mb-3'>
           <Form.Label htmlFor='email'>Email</Form.Label>
           <Form.Control
@@ -82,6 +82,7 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
           />
           <Form.Control.Feedback type='invalid'>Password is required!</Form.Control.Feedback>
         </Form.Group>
+
         <Button
           disabled={!(userFormData.email && userFormData.password)}
           type='submit'

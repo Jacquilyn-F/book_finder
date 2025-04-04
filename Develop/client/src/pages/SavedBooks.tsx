@@ -5,26 +5,21 @@ import { REMOVE_BOOK } from '../utils/mutations';
 
 import { removeBookId } from '../utils/localStorage';
 
+interface SavedBook {
+  bookId: string;
+  title: string;
+  authors: string[];
+  description: string;
+  image?: string;
+}
+
 const SavedBooks = () => {
   const { loading, data } = useQuery(GET_ME);
   const [removeBook] = useMutation(REMOVE_BOOK);
 
-  interface Book {
-    bookId: string;
-    image?: string;
-    title: string;
-    authors: string[];
-    description: string;
-  }
+  const userData = data?.me || {};
 
-  interface UserData {
-    username?: string;
-    savedBooks: Book[];
-  }
-
-  const userData: UserData = data?.me || { savedBooks: [] };
-
-  // create function that accepts the book's mongo _id value as param and deletes the book from the database
+  // create function to delete a book using the REMOVE_BOOK mutation
   const handleDeleteBook = async (bookId: string) => {
     try {
       const { data } = await removeBook({
@@ -60,39 +55,39 @@ const SavedBooks = () => {
       </div>
       <Container>
         <h2 className='pt-5'>
-          {userData.savedBooks?.length
+          {userData.savedBooks.length
             ? `Viewing ${userData.savedBooks.length} saved ${
                 userData.savedBooks.length === 1 ? 'book' : 'books'
               }:`
             : 'You have no saved books!'}
         </h2>
         <Row>
-          {userData.savedBooks.map((book) => {
+            {userData.savedBooks.map((book: SavedBook) => {
             return (
               <Col md='4' key={book.bookId}>
-                <Card border='dark'>
-                  {book.image ? (
-                    <Card.Img
-                      src={book.image}
-                      alt={`The cover for ${book.title}`}
-                      variant='top'
-                    />
-                  ) : null}
-                  <Card.Body>
-                    <Card.Title>{book.title}</Card.Title>
-                    <p className='small'>Authors: {book.authors}</p>
-                    <Card.Text>{book.description}</Card.Text>
-                    <Button
-                      className='btn-block btn-danger'
-                      onClick={() => handleDeleteBook(book.bookId)}
-                    >
-                      Delete this Book!
-                    </Button>
-                  </Card.Body>
-                </Card>
+              <Card border='dark'>
+                {book.image ? (
+                <Card.Img
+                  src={book.image}
+                  alt={`The cover for ${book.title}`}
+                  variant='top'
+                />
+                ) : null}
+                <Card.Body>
+                <Card.Title>{book.title}</Card.Title>
+                <p className='small'>Authors: {book.authors.join(', ')}</p>
+                <Card.Text>{book.description}</Card.Text>
+                <Button
+                  className='btn-block btn-danger'
+                  onClick={() => handleDeleteBook(book.bookId)}
+                >
+                  Delete this Book!
+                </Button>
+                </Card.Body>
+              </Card>
               </Col>
             );
-          })}
+            })}
         </Row>
       </Container>
     </>
