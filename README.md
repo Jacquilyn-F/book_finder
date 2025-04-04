@@ -1,5 +1,6 @@
-# Book_Finder
 <a id="readme-top"></a>
+# Book_Finder
+
 ## Project Overview
 
 The **Book Search Engine** is a web application that allows users to search for books using the Google Books API. This project involves refactoring an existing RESTful API implementation to use GraphQL with Apollo Server. The application is built using the MERN stack and enables users to save book searches to the backend.
@@ -50,7 +51,7 @@ Ensure you have the following installed:
     Start the development server:
 
     ```bash
-    npm run start:dev
+    npm start
     ```
 
 4. **Access the Application**:
