@@ -45,14 +45,20 @@ interface RemoveBookArgs {
 const resolvers = {
     Query: {
       me: async (_parent: unknown, _args: unknown, context: Context) => {
-        if (context.user) {
+        if (!context.user) {
+          throw new Error('Not authenticated');
+        }
+
+        try {
           const foundUser = await User.findOne({ _id: context.user._id }).populate('savedBooks');
           if (!foundUser) {
             throw new Error('Cannot find a user with this id!');
           }
           return foundUser;
+        } catch (err) {
+          console.error('Error in me query:', err);
+          throw new Error('Failed to fetch user data');
         }
-        throw new Error('Not authenticated');
       },
     },
     Mutation: {

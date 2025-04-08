@@ -24,11 +24,18 @@ const startApolloServer = async () => {
   await db;
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
-  app.use('/graphql', expressMiddleware(server as any,
-    {
-      context: authenticateToken as any
-    }
-  ));
+  app.use('/graphql', expressMiddleware(server, {
+    context: async ({ req }) => {
+      const token = req.headers.authorization?.split(' ')[1] || '';
+      try {
+        const user = authenticateToken(token);
+        return { user };
+      } catch (err) {
+        console.error('Error authenticating token:', err);
+        return { user: null };
+      }
+    },
+  }));
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../client/build')));
     app.get('*', (_req: Request, res: Response) => {
