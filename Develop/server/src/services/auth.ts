@@ -45,25 +45,16 @@ export const authMiddleware = ({ req }: { req: any }) => {
 export const authenticateToken = (token: string) => {
   const secretKey = process.env.JWT_SECRET_KEY || '';
 
-  console.log('Token received:', token); // Log the token
+  if (!token) {
+    throw new Error('No token provided');
+  }
 
   try {
-    const decoded = jwt.decode(token) as JwtPayload | null;
-
-    if (!decoded || !decoded.exp) {
-      throw new Error('Token does not contain expiration date');
-    }
-
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (decoded.exp < currentTime) {
-      throw new Error('Token has expired');
-    }
-
     const user = jwt.verify(token, secretKey) as JwtPayload;
     return user;
   } catch (err) {
     console.error('Invalid token:', err);
-    throw new Error('Invalid token');
+    throw new Error('Invalid or expired token');
   }
 };
 
