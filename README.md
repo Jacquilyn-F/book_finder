@@ -63,7 +63,7 @@ Ensure you have the following installed:
 
 The application is deployed on Render with a MongoDB Atlas database and can be accessed at the following live URL:
 
-- [Live Application](https://book-finder-pcom.onrender.com)  
+- [Live Application](https://book-finder-dr1u.onrender.com)  
 - [GitHub Repository](https://github.com/Jacquilyn-F/book_finder)
 
 ## Technologies Used
