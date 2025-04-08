@@ -44,20 +44,16 @@ interface RemoveBookArgs {
 
 const resolvers = {
     Query: {
-        me: async (_parent: unknown, _args: unknown, context: Context) => {
-            if (context.user) {
-                const foundUser = await User.findOne({
-                    _id: context.user._id,
-                }).populate('savedBooks');
-
-                if (!foundUser) {
-                    throw new Error('Cannot find a user with this id!');
-                }
-
-                return foundUser;
-            }
-            throw new Error('Not authenticated');
-        },
+      me: async (_parent: unknown, _args: unknown, context: Context) => {
+        if (context.user) {
+          const foundUser = await User.findOne({ _id: context.user._id }).populate('savedBooks');
+          if (!foundUser) {
+            throw new Error('Cannot find a user with this id!');
+          }
+          return foundUser;
+        }
+        throw new Error('Not authenticated');
+      },
     },
     Mutation: {
         login: async (_parent: unknown, { email, password }: LoginArgs) => {
@@ -86,20 +82,18 @@ const resolvers = {
         },
         saveBook: async (_parent: unknown, { bookData }: SaveBookArgs, context: Context) => {
             if (context.user) {
-                const updatedUser = await User.findOneAndUpdate(
-                    { _id: context.user._id },
-                    { $addToSet: { savedBooks: bookData } },
-                    { new: true, runValidators: true }
-                ).populate('savedBooks');
-
-                if (!updatedUser) {
-                    throw new Error('Failed to save the book.');
-                }
-
-                return updatedUser;
+              const updatedUser = await User.findOneAndUpdate(
+                { _id: context.user._id },
+                { $addToSet: { savedBooks: bookData } },
+                { new: true, runValidators: true }
+              ).populate('savedBooks');
+              if (!updatedUser) {
+                throw new Error('Failed to save the book.');
+              }
+              return updatedUser;
             }
             throw new Error('Not authenticated');
-        },
+          },
         removeBook: async (_parent: unknown, { bookId }: RemoveBookArgs, context: Context) => {
             if (context.user) {
                 const updatedUser = await User.findOneAndUpdate(
